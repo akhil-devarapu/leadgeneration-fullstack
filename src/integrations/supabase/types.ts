@@ -9,138 +9,258 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      analysis: {
+      day_tabs: {
         Row: {
           created_at: string
           id: string
-          insights: Json | null
-          key_points: string[]
-          sentiment_confidence: number | null
-          sentiment_overall: string | null
-          sentiment_timeline: Json | null
-          session_id: string
-          summary: string
+          name: string
+          order_index: number
         }
         Insert: {
           created_at?: string
           id?: string
-          insights?: Json | null
-          key_points?: string[]
-          sentiment_confidence?: number | null
-          sentiment_overall?: string | null
-          sentiment_timeline?: Json | null
-          session_id: string
-          summary: string
+          name: string
+          order_index?: number
         }
         Update: {
           created_at?: string
-          id?: string
-          insights?: Json | null
-          key_points?: string[]
-          sentiment_confidence?: number | null
-          sentiment_overall?: string | null
-          sentiment_timeline?: Json | null
-          session_id?: string
-          summary?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "analysis_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "sessions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sessions: {
-        Row: {
-          created_at: string
-          duration: string | null
-          file_name: string
-          file_size: number
-          file_type: string
-          id: string
-          name: string
-          status: Database["public"]["Enums"]["session_status"]
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          duration?: string | null
-          file_name: string
-          file_size: number
-          file_type: string
-          id?: string
-          name: string
-          status?: Database["public"]["Enums"]["session_status"]
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          duration?: string | null
-          file_name?: string
-          file_size?: number
-          file_type?: string
           id?: string
           name?: string
-          status?: Database["public"]["Enums"]["session_status"]
-          updated_at?: string
-          user_id?: string
+          order_index?: number
         }
         Relationships: []
       }
-      transcripts: {
+      mcqs: {
         Row: {
-          content: string
+          correct_answer: string
           created_at: string
           id: string
-          session_id: string
-          speakers: Json | null
-          timestamps: Json | null
+          option_a: string
+          option_b: string
+          option_c: string
+          option_d: string
+          question: string
+          topic_id: string
+          updated_at: string
         }
         Insert: {
-          content: string
+          correct_answer: string
           created_at?: string
           id?: string
-          session_id: string
-          speakers?: Json | null
-          timestamps?: Json | null
+          option_a: string
+          option_b: string
+          option_c: string
+          option_d: string
+          question: string
+          topic_id: string
+          updated_at?: string
         }
         Update: {
-          content?: string
+          correct_answer?: string
           created_at?: string
           id?: string
-          session_id?: string
-          speakers?: Json | null
-          timestamps?: Json | null
+          option_a?: string
+          option_b?: string
+          option_c?: string
+          option_d?: string
+          question?: string
+          topic_id?: string
+          updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "transcripts_session_id_fkey"
-            columns: ["session_id"]
+            foreignKeyName: "mcqs_topic_id_fkey"
+            columns: ["topic_id"]
             isOneToOne: false
-            referencedRelation: "sessions"
+            referencedRelation: "topics"
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      prompts: {
+        Row: {
+          created_at: string
+          detected_techniques: string[] | null
+          evaluation_score: number | null
+          feedback_improvements: string | null
+          feedback_positive: string | null
+          id: string
+          original_prompt: string
+          overuse_warnings: string[] | null
+          parent_prompt_id: string | null
+          rewritten_prompt: string | null
+          unnecessary_techniques: string | null
+          user_id: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          detected_techniques?: string[] | null
+          evaluation_score?: number | null
+          feedback_improvements?: string | null
+          feedback_positive?: string | null
+          id?: string
+          original_prompt: string
+          overuse_warnings?: string[] | null
+          parent_prompt_id?: string | null
+          rewritten_prompt?: string | null
+          unnecessary_techniques?: string | null
+          user_id: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          detected_techniques?: string[] | null
+          evaluation_score?: number | null
+          feedback_improvements?: string | null
+          feedback_positive?: string | null
+          id?: string
+          original_prompt?: string
+          overuse_warnings?: string[] | null
+          parent_prompt_id?: string | null
+          rewritten_prompt?: string | null
+          unnecessary_techniques?: string | null
+          user_id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompts_parent_prompt_id_fkey"
+            columns: ["parent_prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resources: {
+        Row: {
+          created_at: string
+          created_by: string
+          day_tab: string | null
+          description: string | null
+          id: string
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          day_tab?: string | null
+          description?: string | null
+          id?: string
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          day_tab?: string | null
+          description?: string | null
+          id?: string
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
+      topics: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          order_index: number
+          resource_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          order_index?: number
+          resource_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          order_index?: number
+          resource_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "topics_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: false
+            referencedRelation: "resources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _user_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      session_status:
-        | "uploading"
-        | "transcribing"
-        | "analyzing"
-        | "completed"
-        | "failed"
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -256,13 +376,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      session_status: [
-        "uploading",
-        "transcribing",
-        "analyzing",
-        "completed",
-        "failed",
-      ],
+      app_role: ["admin", "user"],
     },
   },
 } as const
