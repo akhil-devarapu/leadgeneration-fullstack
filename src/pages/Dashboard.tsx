@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -17,8 +18,6 @@ const Dashboard = () => {
     email: user?.email || '',
     education: ''
   });
-  const [attendedWebinar, setAttendedWebinar] = useState(false);
-  const [downloadedBrochure, setDownloadedBrochure] = useState(false);
 
   const educationOptions = [
     'B.Tech',
@@ -84,11 +83,8 @@ const Dashboard = () => {
     }
 
     try {
-      // Trigger file download (simulate)
-      const link = document.createElement('a');
-      link.href = '#';
-      link.download = 'NxtWave-Brochure.pdf';
-      link.click();
+      // Open the Google Drive link in a new tab
+      window.open('https://drive.google.com/file/d/1_XTd8M2XCbBv4EeBz9sTki0IWMzuHEzs/view?usp=sharing', '_blank');
 
       // Update lead status
       const response = await fetch(`${API_BASE_URL}/update_lead`, {
@@ -105,17 +101,16 @@ const Dashboard = () => {
       });
 
       if (response.ok) {
-        setDownloadedBrochure(true);
         toast({
-          title: "Brochure downloaded!",
-          description: "Your download has started successfully.",
+          title: "Brochure opened!",
+          description: "The brochure has been opened in a new tab.",
         });
       } else {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to update lead');
       }
     } catch (error) {
-      console.error('Error downloading brochure:', error);
+      console.error('Error opening brochure:', error);
       toast({
         title: "Error",
         description: error.message,
@@ -153,7 +148,6 @@ const Dashboard = () => {
       });
 
       if (response.ok) {
-        setAttendedWebinar(true);
         toast({
           title: "Webinar attended!",
           description: "Thank you for watching the webinar.",
@@ -393,3 +387,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
