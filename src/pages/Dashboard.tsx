@@ -1,5 +1,4 @@
 
-
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -176,16 +175,16 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm shadow-sm border-0">
+      <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-3">
-              <h1 className="text-2xl font-bold text-blue-900">NxtWave</h1>
+              <h1 className="text-2xl font-bold text-black">MyLeadGen</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-gray-700">
+              <div className="flex items-center space-x-2 text-black">
                 <User className="h-5 w-5" />
                 <span className="font-medium">{user?.user_metadata?.name || user?.email}</span>
               </div>
@@ -193,7 +192,7 @@ const Dashboard = () => {
                 onClick={handleLogout}
                 variant="outline"
                 size="sm"
-                className="flex items-center space-x-2 border-gray-300 hover:bg-gray-50"
+                className="flex items-center space-x-2 border-red-600 text-red-600 hover:bg-red-50"
               >
                 <LogOut className="h-4 w-4" />
                 <span>Logout</span>
@@ -206,8 +205,9 @@ const Dashboard = () => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-12 relative">
+          <div className="absolute top-0 right-1/4 w-20 h-1 bg-red-600 transform rotate-12"></div>
+          <h2 className="text-4xl font-bold text-black mb-4">
             Welcome, {user?.user_metadata?.name || user?.email}!
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -217,14 +217,15 @@ const Dashboard = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Lead Registration Form */}
-          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+          <Card className="shadow-lg border-0 bg-white relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-red-600"></div>
             <CardHeader>
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <BookOpen className="h-6 w-6 text-purple-600" />
+                <div className="p-2 bg-red-100 rounded-lg">
+                  <BookOpen className="h-6 w-6 text-red-600" />
                 </div>
                 <div>
-                  <CardTitle className="text-gray-800">Lead Registration</CardTitle>
+                  <CardTitle className="text-black">Lead Registration</CardTitle>
                   <CardDescription>
                     Register for our webinar and download our brochure
                   </CardDescription>
@@ -234,36 +235,36 @@ const Dashboard = () => {
             <CardContent>
               <form onSubmit={handleSubmitLead} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-gray-700">Name</Label>
+                  <Label htmlFor="name" className="text-black">Name</Label>
                   <Input
                     id="name"
                     type="text"
                     placeholder="Enter your full name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                    className="border-gray-300 focus:border-red-600 focus:ring-red-600"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-gray-700">Email</Label>
+                  <Label htmlFor="email" className="text-black">Email</Label>
                   <Input
                     id="email"
                     type="email"
                     placeholder="Enter your email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                    className="border-gray-300 focus:border-red-600 focus:ring-red-600"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="education" className="text-gray-700">Education</Label>
+                  <Label htmlFor="education" className="text-black">Education</Label>
                   <Select 
                     value={formData.education} 
                     onValueChange={(value) => setFormData({ ...formData, education: value })}
                   >
-                    <SelectTrigger className="border-gray-300 focus:border-purple-500 focus:ring-purple-500">
+                    <SelectTrigger className="border-gray-300 focus:border-red-600 focus:ring-red-600">
                       <SelectValue placeholder="Select your education level" />
                     </SelectTrigger>
                     <SelectContent>
@@ -278,7 +279,7 @@ const Dashboard = () => {
                 
                 <Button 
                   type="submit" 
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 rounded-lg transition-colors duration-200"
+                  className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 rounded-lg transition-colors duration-200"
                 >
                   Submit Lead
                 </Button>
@@ -289,14 +290,15 @@ const Dashboard = () => {
           {/* Action Cards */}
           <div className="space-y-6">
             {/* Download Brochure Card */}
-            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm hover:shadow-xl transition-shadow duration-300">
+            <Card className="shadow-lg border-0 bg-white hover:shadow-xl transition-shadow duration-300 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-1 bg-red-600 transform rotate-12 translate-x-2"></div>
               <CardHeader>
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Download className="h-6 w-6 text-blue-600" />
+                  <div className="p-2 bg-red-100 rounded-lg">
+                    <Download className="h-6 w-6 text-red-600" />
                   </div>
                   <div>
-                    <CardTitle className="text-gray-800">Download Brochure</CardTitle>
+                    <CardTitle className="text-black">Download Brochure</CardTitle>
                     <CardDescription>
                       Get detailed information about our programs and courses
                     </CardDescription>
@@ -306,7 +308,7 @@ const Dashboard = () => {
               <CardContent>
                 <Button
                   onClick={handleDownloadBrochure}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors duration-200"
+                  className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 rounded-lg transition-colors duration-200"
                 >
                   <Download className="mr-2 h-4 w-4" />
                   Download Brochure
@@ -315,14 +317,15 @@ const Dashboard = () => {
             </Card>
 
             {/* Attend Webinar Card */}
-            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm hover:shadow-xl transition-shadow duration-300">
+            <Card className="shadow-lg border-0 bg-white hover:shadow-xl transition-shadow duration-300 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-1 bg-red-600 transform rotate-12 translate-x-2"></div>
               <CardHeader>
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <Video className="h-6 w-6 text-green-600" />
+                  <div className="p-2 bg-red-100 rounded-lg">
+                    <Video className="h-6 w-6 text-red-600" />
                   </div>
                   <div>
-                    <CardTitle className="text-gray-800">Attend Webinar</CardTitle>
+                    <CardTitle className="text-black">Attend Webinar</CardTitle>
                     <CardDescription>
                       Join our exclusive webinar and learn from industry experts
                     </CardDescription>
@@ -332,7 +335,7 @@ const Dashboard = () => {
               <CardContent>
                 <Button
                   onClick={handleAttendWebinar}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg transition-colors duration-200"
+                  className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 rounded-lg transition-colors duration-200"
                 >
                   <Video className="mr-2 h-4 w-4" />
                   Join Webinar
@@ -345,13 +348,15 @@ const Dashboard = () => {
         {/* Video Modal */}
         {showVideo && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[80vh] overflow-auto">
+            <div className="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[80vh] overflow-auto relative">
+              <div className="absolute top-0 left-0 w-full h-1 bg-red-600"></div>
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-2xl font-bold text-gray-800">Career Growth Webinar</h3>
+                <h3 className="text-2xl font-bold text-black">Career Growth Webinar</h3>
                 <Button
                   onClick={() => setShowVideo(false)}
                   variant="outline"
                   size="sm"
+                  className="border-red-600 text-red-600 hover:bg-red-50"
                 >
                   Close
                 </Button>
@@ -373,7 +378,7 @@ const Dashboard = () => {
               <div className="flex justify-center">
                 <Button
                   onClick={handleMarkWebinarAttended}
-                  className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200"
+                  className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200"
                 >
                   Mark as Completed
                 </Button>
@@ -387,4 +392,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
