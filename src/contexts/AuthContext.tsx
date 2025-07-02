@@ -1,18 +1,16 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-
-interface User {
-  name: string;
-  email: string;
-  education: string;
-}
+import { supabase } from '@/integrations/supabase/client';
+import { User, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  signup: (name: string, email: string, password: string, education: string) => Promise<boolean>;
-  logout: () => void;
+  session: Session | null;
+  login: (email: string, password: string) => Promise<{ error: string | null }>;
+  signup: (name: string, email: string, password: string, education: string) => Promise<{ error: string | null }>;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,81 +29,87 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is stored in localStorage on app start
-    const storedUser = localStorage.getItem('nxtwave_user');
-    if (storedUser) {
-      const userData = JSON.parse(storedUser);
-      setUser(userData);
-      setIsAuthenticated(true);
-    }
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log('Auth state changed:', event, session);
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    );
+
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string) => {
     try {
-      // For demo purposes, we'll simulate authentication
-      // In a real app, you'd call your authentication API here
-      console.log('Login attempt:', { email, password });
-      
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // For demo, create a mock user (you can replace with actual API call)
-      const mockUser: User = {
-        name: 'Demo User',
-        email: email,
-        education: 'B.Tech'
-      };
-      
-      setUser(mockUser);
-      setIsAuthenticated(true);
-      localStorage.setItem('nxtwave_user', JSON.stringify(mockUser));
-      
-      return true;
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        return { error: error.message };
+      }
+
+      return { error: null };
     } catch (error) {
       console.error('Login error:', error);
-      return false;
+      return { error: 'An unexpected error occurred' };
     }
   };
 
-  const signup = async (name: string, email: string, password: string, education: string): Promise<boolean> => {
+  const signup = async (name: string, email: string, password: string, education: string) => {
     try {
-      console.log('Signup attempt:', { name, email, password, education });
+      const redirectUrl = `${window.location.origin}/`;
       
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const newUser: User = {
-        name,
+      const { error } = await supabase.auth.signUp({
         email,
-        education
-      };
-      
-      setUser(newUser);
-      setIsAuthenticated(true);
-      localStorage.setItem('nxtwave_user', JSON.stringify(newUser));
-      
-      return true;
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            name,
+            education
+          }
+        }
+      });
+
+      if (error) {
+        return { error: error.message };
+      }
+
+      return { error: null };
     } catch (error) {
       console.error('Signup error:', error);
-      return false;
+      return { error: 'An unexpected error occurred' };
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem('nxtwave_user');
+  const logout = async () => {
+    await supabase.auth.signOut();
   };
 
   const value: AuthContextType = {
     user,
+    session,
     login,
     signup,
     logout,
-    isAuthenticated
+    isAuthenticated: !!session,
+    loading
   };
 
   return (

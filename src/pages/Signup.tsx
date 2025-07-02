@@ -51,20 +51,21 @@ const Signup = () => {
     setIsLoading(true);
     
     try {
-      const success = await signup(name, email, password, education);
+      const { error } = await signup(name, email, password, education);
       
-      if (success) {
-        toast({
-          title: "Welcome to NxtWave!",
-          description: "Your account has been created successfully.",
-        });
-        navigate('/dashboard');
-      } else {
+      if (error) {
         toast({
           title: "Signup failed",
-          description: "Unable to create account. Please try again.",
+          description: error,
           variant: "destructive",
         });
+      } else {
+        toast({
+          title: "Check your email!",
+          description: "We've sent you a verification link. Please check your email and click the link to verify your account.",
+        });
+        // Redirect to login page after successful signup
+        navigate('/login');
       }
     } catch (error) {
       toast({
