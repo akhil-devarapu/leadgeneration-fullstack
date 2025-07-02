@@ -128,6 +128,39 @@ const Index = () => {
           </Link>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold mb-4">Meet Our Founders</h3>
+            <div className="flex justify-center mb-8">
+              <img 
+                src="/lovable-uploads/62f8ba09-6c99-4045-b7eb-7af69b7555df.png" 
+                alt="NxtWave Founders - Sashank Gujjula, Anupam Pedarla, and Rahul Attuluri" 
+                className="max-w-full h-auto rounded-lg shadow-lg"
+              />
+            </div>
+          </div>
+          
+          <div className="border-t border-gray-700 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <div className="mb-4 md:mb-0">
+                <h4 className="text-2xl font-bold text-blue-400">NxtWave</h4>
+                <p className="text-gray-400 mt-2">Transforming careers through technology</p>
+              </div>
+              <div className="flex space-x-6">
+                <a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</a>
+                <a href="#" className="text-gray-400 hover:text-white transition-colors">Terms of Service</a>
+                <a href="#" className="text-gray-400 hover:text-white transition-colors">Contact Us</a>
+              </div>
+            </div>
+            <div className="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400">
+              <p>&copy; 2024 NxtWave. All rights reserved.</p>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
