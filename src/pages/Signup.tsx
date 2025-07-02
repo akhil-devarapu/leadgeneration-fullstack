@@ -5,7 +5,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
@@ -14,23 +13,14 @@ const Signup = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [education, setEducation] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { signup } = useAuth();
   const navigate = useNavigate();
 
-  const educationOptions = [
-    'B.Tech',
-    'B.Sc',
-    'B.Com',
-    'Diploma',
-    'Other'
-  ];
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name || !email || !password || !education) {
+    if (!name || !email || !password) {
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -51,7 +41,7 @@ const Signup = () => {
     setIsLoading(true);
     
     try {
-      const { error } = await signup(name, email, password, education);
+      const { error } = await signup(name, email, password);
       
       if (error) {
         toast({
@@ -132,22 +122,6 @@ const Signup = () => {
                   className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                   disabled={isLoading}
                 />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="education" className="text-gray-700">Education</Label>
-                <Select value={education} onValueChange={setEducation} disabled={isLoading}>
-                  <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                    <SelectValue placeholder="Select your education level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {educationOptions.map((option) => (
-                      <SelectItem key={option} value={option}>
-                        {option}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
               
               <Button 

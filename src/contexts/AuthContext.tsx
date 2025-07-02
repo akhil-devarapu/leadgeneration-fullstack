@@ -7,7 +7,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   login: (email: string, password: string) => Promise<{ error: string | null }>;
-  signup: (name: string, email: string, password: string, education: string) => Promise<{ error: string | null }>;
+  signup: (name: string, email: string, password: string) => Promise<{ error: string | null }>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
   loading: boolean;
@@ -103,7 +103,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const signup = async (name: string, email: string, password: string, education: string) => {
+  const signup = async (name: string, email: string, password: string) => {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
@@ -113,8 +113,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         options: {
           emailRedirectTo: redirectUrl,
           data: {
-            name,
-            education
+            full_name: name
           }
         }
       });
