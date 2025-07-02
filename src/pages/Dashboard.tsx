@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
@@ -11,12 +13,14 @@ import { Download, Video, LogOut, User, BookOpen } from 'lucide-react';
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const [showVideo, setShowVideo] = useState(false);
-  const [showRegistrationForm, setShowRegistrationForm] = useState(true);
   const [formData, setFormData] = useState({
     name: user?.user_metadata?.name || '',
     email: user?.email || '',
-    education: user?.user_metadata?.education || ''
+    education: ''
   });
+  const [attendedWebinar, setAttendedWebinar] = useState(false);
+  const [downloadedBrochure, setDownloadedBrochure] = useState(false);
+  const [responseMessage, setResponseMessage] = useState('');
 
   const educationOptions = [
     'B.Tech',
@@ -50,41 +54,59 @@ const Dashboard = () => {
           name: formData.name,
           email: formData.email,
           education: formData.education,
-          attended_webinar: 'No',
-          downloaded_brochure: 'No'
+          attended_webinar: attendedWebinar ? 'Yes' : 'No',
+          downloaded_brochure: downloadedBrochure ? 'Yes' : 'No'
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
+        setResponseMessage(`Lead updated and email sent successfully.\nScore: ${data.score || 'N/A'}\nSummary: ${data.summary || 'No summary available'}`);
         toast({
-          title: "Registration successful!",
-          description: "Check your email for next steps.",
+          title: "Success!",
+          description: "Lead registered successfully.",
         });
-        setShowRegistrationForm(false);
         console.log('Lead submitted:', data);
       } else {
-        throw new Error('Failed to submit lead');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to submit lead');
       }
     } catch (error) {
       console.error('Error submitting lead:', error);
+      setResponseMessage(`Error: ${error.message}`);
       toast({
         title: "Error",
-        description: "Failed to register. Please try again.",
+        description: error.message,
         variant: "destructive",
       });
     }
   };
 
   const handleDownloadBrochure = async () => {
+    if (!formData.email) {
+      toast({
+        title: "Error",
+        description: "Please provide an email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
+      // Trigger file download (simulate)
+      const link = document.createElement('a');
+      link.href = '#';
+      link.download = 'NxtWave-Brochure.pdf';
+      link.click();
+
+      // Update lead status
       const response = await fetch(`${API_BASE_URL}/update_lead`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: user?.email,
+          email: formData.email,
           update: {
             "Downloaded Brochure": "Yes"
           }
@@ -92,23 +114,23 @@ const Dashboard = () => {
       });
 
       if (response.ok) {
+        const data = await response.json();
+        setDownloadedBrochure(true);
+        setResponseMessage(`Lead updated and email sent successfully.\nScore: ${data.score || 'N/A'}\nSummary: ${data.summary || 'Brochure downloaded successfully'}`);
         toast({
           title: "Brochure downloaded!",
           description: "Your download has started successfully.",
         });
-        // Simulate actual download
-        const link = document.createElement('a');
-        link.href = '#';
-        link.download = 'NxtWave-Brochure.pdf';
-        link.click();
       } else {
-        throw new Error('Failed to update lead');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update lead');
       }
     } catch (error) {
       console.error('Error downloading brochure:', error);
+      setResponseMessage(`Error: ${error.message}`);
       toast({
         title: "Error",
-        description: "Failed to download brochure. Please try again.",
+        description: error.message,
         variant: "destructive",
       });
     }
@@ -118,7 +140,16 @@ const Dashboard = () => {
     setShowVideo(true);
   };
 
-  const handleVideoEnd = async () => {
+  const handleMarkWebinarAttended = async () => {
+    if (!formData.email) {
+      toast({
+        title: "Error",
+        description: "Please provide an email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/update_lead`, {
         method: 'PATCH',
@@ -126,7 +157,7 @@ const Dashboard = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: user?.email,
+          email: formData.email,
           update: {
             "Attended Webinar": "Yes"
           }
@@ -134,18 +165,23 @@ const Dashboard = () => {
       });
 
       if (response.ok) {
+        const data = await response.json();
+        setAttendedWebinar(true);
+        setResponseMessage(`Lead updated and email sent successfully.\nScore: ${data.score || 'N/A'}\nSummary: ${data.summary || 'Webinar attendance marked successfully'}`);
         toast({
           title: "Webinar attended!",
-          description: "Thank you for watching the complete webinar.",
+          description: "Thank you for watching the webinar.",
         });
       } else {
-        throw new Error('Failed to update lead');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update lead');
       }
     } catch (error) {
       console.error('Error updating webinar attendance:', error);
+      setResponseMessage(`Error: ${error.message}`);
       toast({
         title: "Error",
-        description: "Failed to record webinar attendance.",
+        description: error.message,
         variant: "destructive",
       });
     }
@@ -201,6 +237,107 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Lead Registration Form */}
+          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+            <CardHeader>
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <BookOpen className="h-6 w-6 text-purple-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-gray-800">Lead Registration</CardTitle>
+                  <CardDescription>
+                    Register for our webinar and download our brochure
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmitLead} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-gray-700">Name</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Enter your full name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-gray-700">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="education" className="text-gray-700">Education</Label>
+                  <Select 
+                    value={formData.education} 
+                    onValueChange={(value) => setFormData({ ...formData, education: value })}
+                  >
+                    <SelectTrigger className="border-gray-300 focus:border-purple-500 focus:ring-purple-500">
+                      <SelectValue placeholder="Select your education level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {educationOptions.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="attendedWebinar"
+                      checked={attendedWebinar}
+                      onCheckedChange={setAttendedWebinar}
+                    />
+                    <Label htmlFor="attendedWebinar" className="text-gray-700">
+                      Attended Webinar
+                    </Label>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="downloadedBrochure"
+                      checked={downloadedBrochure}
+                      onCheckedChange={setDownloadedBrochure}
+                    />
+                    <Label htmlFor="downloadedBrochure" className="text-gray-700">
+                      Downloaded Brochure
+                    </Label>
+                  </div>
+                </div>
+                
+                <Button 
+                  type="submit" 
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 rounded-lg transition-colors duration-200"
+                >
+                  Submit Lead
+                </Button>
+              </form>
+
+              {/* Response Message */}
+              {responseMessage && (
+                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                  <pre className="text-sm text-gray-700 whitespace-pre-wrap">{responseMessage}</pre>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Action Cards */}
           <div className="space-y-6">
             {/* Download Brochure Card */}
@@ -224,7 +361,7 @@ const Dashboard = () => {
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors duration-200"
                 >
                   <Download className="mr-2 h-4 w-4" />
-                  Download Now
+                  Download Brochure
                 </Button>
               </CardContent>
             </Card>
@@ -254,79 +391,33 @@ const Dashboard = () => {
                 </Button>
               </CardContent>
             </Card>
-          </div>
 
-          {/* Registration Form */}
-          {showRegistrationForm && (
-            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+            {/* Mark Webinar Attended Button */}
+            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm hover:shadow-xl transition-shadow duration-300">
               <CardHeader>
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <BookOpen className="h-6 w-6 text-purple-600" />
+                  <div className="p-2 bg-orange-100 rounded-lg">
+                    <Video className="h-6 w-6 text-orange-600" />
                   </div>
                   <div>
-                    <CardTitle className="text-gray-800">Complete Your Profile</CardTitle>
+                    <CardTitle className="text-gray-800">Mark Webinar Attended</CardTitle>
                     <CardDescription>
-                      Help us personalize your learning experience
+                      Mark that you have attended the webinar
                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmitLead} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-gray-700">Full Name</Label>
-                    <Input
-                      id="name"
-                      type="text"
-                      placeholder="Enter your full name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-gray-700">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="Enter your email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="education" className="text-gray-700">Education</Label>
-                    <Select 
-                      value={formData.education} 
-                      onValueChange={(value) => setFormData({ ...formData, education: value })}
-                    >
-                      <SelectTrigger className="border-gray-300 focus:border-purple-500 focus:ring-purple-500">
-                        <SelectValue placeholder="Select your education level" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {educationOptions.map((option) => (
-                          <SelectItem key={option} value={option}>
-                            {option}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 rounded-lg transition-colors duration-200"
-                  >
-                    Submit Registration
-                  </Button>
-                </form>
+                <Button
+                  onClick={handleMarkWebinarAttended}
+                  className="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-3 rounded-lg transition-colors duration-200"
+                >
+                  <Video className="mr-2 h-4 w-4" />
+                  Mark Attended Webinar
+                </Button>
               </CardContent>
             </Card>
-          )}
+          </div>
         </div>
 
         {/* Video Modal */}
@@ -354,13 +445,12 @@ const Dashboard = () => {
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   className="rounded-lg"
-                  onEnded={handleVideoEnd}
                 ></iframe>
               </div>
               
               <div className="flex justify-center">
                 <Button
-                  onClick={handleVideoEnd}
+                  onClick={handleMarkWebinarAttended}
                   className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200"
                 >
                   Mark as Completed
