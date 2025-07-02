@@ -196,6 +196,14 @@ const Dashboard = () => {
     });
   };
 
+  const handleAttendedWebinarChange = (checked: boolean | "indeterminate") => {
+    setAttendedWebinar(checked === true);
+  };
+
+  const handleDownloadedBrochureChange = (checked: boolean | "indeterminate") => {
+    setDownloadedBrochure(checked === true);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
       {/* Header */}
@@ -302,7 +310,7 @@ const Dashboard = () => {
                     <Checkbox 
                       id="attendedWebinar"
                       checked={attendedWebinar}
-                      onCheckedChange={setAttendedWebinar}
+                      onCheckedChange={handleAttendedWebinarChange}
                     />
                     <Label htmlFor="attendedWebinar" className="text-gray-700">
                       Attended Webinar
@@ -313,7 +321,7 @@ const Dashboard = () => {
                     <Checkbox 
                       id="downloadedBrochure"
                       checked={downloadedBrochure}
-                      onCheckedChange={setDownloadedBrochure}
+                      onCheckedChange={handleDownloadedBrochureChange}
                     />
                     <Label htmlFor="downloadedBrochure" className="text-gray-700">
                       Downloaded Brochure
