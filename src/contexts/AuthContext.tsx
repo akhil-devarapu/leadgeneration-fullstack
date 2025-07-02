@@ -37,16 +37,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log('Auth state changed:', event, session);
-        setSession(session);
-        setUser(session?.user ?? null);
+        // Only set session if user is confirmed (email verified)
+        if (session?.user?.email_confirmed_at) {
+          setSession(session);
+          setUser(session.user);
+        } else {
+          setSession(null);
+          setUser(null);
+        }
         setLoading(false);
       }
     );
 
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+      // Only set session if user is confirmed (email verified)
+      if (session?.user?.email_confirmed_at) {
+        setSession(session);
+        setUser(session.user);
+      } else {
+        setSession(null);
+        setUser(null);
+      }
       setLoading(false);
     });
 
@@ -91,6 +103,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return { error: error.message };
       }
 
+      // After successful signup, immediately sign out to prevent auto-login
+      await supabase.auth.signOut();
+
       return { error: null };
     } catch (error) {
       console.error('Signup error:', error);
@@ -108,7 +123,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     signup,
     logout,
-    isAuthenticated: !!session,
+    isAuthenticated: !!session && !!user?.email_confirmed_at,
     loading
   };
 
