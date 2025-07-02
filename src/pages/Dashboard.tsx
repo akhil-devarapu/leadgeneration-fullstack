@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -57,10 +58,6 @@ const Dashboard = () => {
       });
 
       if (response.ok) {
-        toast({
-          title: "Success!",
-          description: "Lead registered successfully.",
-        });
         console.log('Lead submitted successfully');
       } else {
         const errorData = await response.json();
@@ -345,32 +342,6 @@ const Dashboard = () => {
                 >
                   <Video className="mr-2 h-4 w-4" />
                   Join Webinar
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Mark Webinar Attended Button */}
-            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm hover:shadow-xl transition-shadow duration-300">
-              <CardHeader>
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-orange-100 rounded-lg">
-                    <Video className="h-6 w-6 text-orange-600" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-gray-800">Mark Webinar Attended</CardTitle>
-                    <CardDescription>
-                      Mark that you have attended the webinar
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  onClick={handleMarkWebinarAttended}
-                  className="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-3 rounded-lg transition-colors duration-200"
-                >
-                  <Video className="mr-2 h-4 w-4" />
-                  Mark Attended Webinar
                 </Button>
               </CardContent>
             </Card>
