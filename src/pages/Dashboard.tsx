@@ -86,7 +86,7 @@ const Dashboard = () => {
         body: JSON.stringify({
           email: user?.email,
           update: {
-            'Downloaded Brochure': 'Yes'
+            "Downloaded Brochure": "Yes"
           }
         }),
       });
@@ -128,7 +128,7 @@ const Dashboard = () => {
         body: JSON.stringify({
           email: user?.email,
           update: {
-            'Attended Webinar': 'Yes'
+            "Attended Webinar": "Yes"
           }
         }),
       });
