@@ -1,10 +1,8 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
@@ -20,7 +18,6 @@ const Dashboard = () => {
   });
   const [attendedWebinar, setAttendedWebinar] = useState(false);
   const [downloadedBrochure, setDownloadedBrochure] = useState(false);
-  const [responseMessage, setResponseMessage] = useState('');
 
   const educationOptions = [
     'B.Tech',
@@ -54,26 +51,23 @@ const Dashboard = () => {
           name: formData.name,
           email: formData.email,
           education: formData.education,
-          attended_webinar: attendedWebinar ? 'Yes' : 'No',
-          downloaded_brochure: downloadedBrochure ? 'Yes' : 'No'
+          attended_webinar: 'No',
+          downloaded_brochure: 'No'
         }),
       });
 
       if (response.ok) {
-        const data = await response.json();
-        setResponseMessage(`Lead updated and email sent successfully.\nScore: ${data.score || 'N/A'}\nSummary: ${data.summary || 'No summary available'}`);
         toast({
           title: "Success!",
           description: "Lead registered successfully.",
         });
-        console.log('Lead submitted:', data);
+        console.log('Lead submitted successfully');
       } else {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to submit lead');
       }
     } catch (error) {
       console.error('Error submitting lead:', error);
-      setResponseMessage(`Error: ${error.message}`);
       toast({
         title: "Error",
         description: error.message,
@@ -114,9 +108,7 @@ const Dashboard = () => {
       });
 
       if (response.ok) {
-        const data = await response.json();
         setDownloadedBrochure(true);
-        setResponseMessage(`Lead updated and email sent successfully.\nScore: ${data.score || 'N/A'}\nSummary: ${data.summary || 'Brochure downloaded successfully'}`);
         toast({
           title: "Brochure downloaded!",
           description: "Your download has started successfully.",
@@ -127,7 +119,6 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error('Error downloading brochure:', error);
-      setResponseMessage(`Error: ${error.message}`);
       toast({
         title: "Error",
         description: error.message,
@@ -165,9 +156,7 @@ const Dashboard = () => {
       });
 
       if (response.ok) {
-        const data = await response.json();
         setAttendedWebinar(true);
-        setResponseMessage(`Lead updated and email sent successfully.\nScore: ${data.score || 'N/A'}\nSummary: ${data.summary || 'Webinar attendance marked successfully'}`);
         toast({
           title: "Webinar attended!",
           description: "Thank you for watching the webinar.",
@@ -178,7 +167,6 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error('Error updating webinar attendance:', error);
-      setResponseMessage(`Error: ${error.message}`);
       toast({
         title: "Error",
         description: error.message,
@@ -194,14 +182,6 @@ const Dashboard = () => {
       title: "Logged out",
       description: "You have been successfully logged out.",
     });
-  };
-
-  const handleAttendedWebinarChange = (checked: boolean | "indeterminate") => {
-    setAttendedWebinar(checked === true);
-  };
-
-  const handleDownloadedBrochureChange = (checked: boolean | "indeterminate") => {
-    setDownloadedBrochure(checked === true);
   };
 
   return (
@@ -304,30 +284,6 @@ const Dashboard = () => {
                     </SelectContent>
                   </Select>
                 </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="attendedWebinar"
-                      checked={attendedWebinar}
-                      onCheckedChange={handleAttendedWebinarChange}
-                    />
-                    <Label htmlFor="attendedWebinar" className="text-gray-700">
-                      Attended Webinar
-                    </Label>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="downloadedBrochure"
-                      checked={downloadedBrochure}
-                      onCheckedChange={handleDownloadedBrochureChange}
-                    />
-                    <Label htmlFor="downloadedBrochure" className="text-gray-700">
-                      Downloaded Brochure
-                    </Label>
-                  </div>
-                </div>
                 
                 <Button 
                   type="submit" 
@@ -336,13 +292,6 @@ const Dashboard = () => {
                   Submit Lead
                 </Button>
               </form>
-
-              {/* Response Message */}
-              {responseMessage && (
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                  <pre className="text-sm text-gray-700 whitespace-pre-wrap">{responseMessage}</pre>
-                </div>
-              )}
             </CardContent>
           </Card>
 
