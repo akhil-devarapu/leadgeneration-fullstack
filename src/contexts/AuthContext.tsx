@@ -37,14 +37,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log('Auth state changed:', event, session);
-        // Only set session if user is confirmed (email verified)
-        if (session?.user?.email_confirmed_at) {
-          setSession(session);
-          setUser(session.user);
-        } else {
+        
+        // For login events, check if email is confirmed
+        if (event === 'SIGNED_IN' && session?.user) {
+          // Only allow access if email is confirmed
+          if (session.user.email_confirmed_at) {
+            setSession(session);
+            setUser(session.user);
+          } else {
+            // If email not confirmed, sign out immediately
+            console.log('Email not confirmed, signing out');
+            supabase.auth.signOut();
+            setSession(null);
+            setUser(null);
+          }
+        } else if (event === 'SIGNED_OUT') {
           setSession(null);
           setUser(null);
+        } else if (event === 'TOKEN_REFRESHED' && session?.user?.email_confirmed_at) {
+          setSession(session);
+          setUser(session.user);
         }
+        
         setLoading(false);
       }
     );
@@ -67,13 +81,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
         return { error: error.message };
+      }
+
+      // Additional check: if user is not confirmed, sign out immediately
+      if (data.user && !data.user.email_confirmed_at) {
+        await supabase.auth.signOut();
+        return { error: 'Please verify your email before signing in. Check your inbox for the verification link.' };
       }
 
       return { error: null };
