@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -14,9 +13,9 @@ const Dashboard = () => {
   const [showVideo, setShowVideo] = useState(false);
   const [showRegistrationForm, setShowRegistrationForm] = useState(true);
   const [formData, setFormData] = useState({
-    name: user?.name || '',
+    name: user?.user_metadata?.name || '',
     email: user?.email || '',
-    education: user?.education || ''
+    education: user?.user_metadata?.education || ''
   });
 
   const educationOptions = [
@@ -173,7 +172,7 @@ const Dashboard = () => {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 text-gray-700">
                 <User className="h-5 w-5" />
-                <span className="font-medium">{user?.name}</span>
+                <span className="font-medium">{user?.user_metadata?.name || user?.email}</span>
               </div>
               <Button
                 onClick={handleLogout}
@@ -194,7 +193,7 @@ const Dashboard = () => {
         {/* Welcome Section */}
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Welcome, {user?.name}!
+            Welcome, {user?.user_metadata?.name || user?.email}!
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Let's explore your career opportunities and take the next step towards your professional growth.
