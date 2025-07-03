@@ -1,5 +1,4 @@
 
-
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -13,6 +12,7 @@ import { Download, Video, LogOut, User, BookOpen } from 'lucide-react';
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const [showVideo, setShowVideo] = useState(false);
+  const [isStudentRegistered, setIsStudentRegistered] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.user_metadata?.name || '',
     email: user?.email || '',
@@ -29,7 +29,7 @@ const Dashboard = () => {
 
   const API_BASE_URL = 'http://localhost:5000';
 
-  const handleSubmitLead = async (e: React.FormEvent) => {
+  const handleSubmitStudent = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name || !formData.email || !formData.education) {
@@ -57,13 +57,18 @@ const Dashboard = () => {
       });
 
       if (response.ok) {
-        console.log('Lead submitted successfully');
+        console.log('Student registered successfully');
+        setIsStudentRegistered(true);
+        toast({
+          title: "Success",
+          description: "Student registration completed successfully!",
+        });
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to submit lead');
+        throw new Error(errorData.error || 'Failed to register student');
       }
     } catch (error) {
-      console.error('Error submitting lead:', error);
+      console.error('Error registering student:', error);
       toast({
         title: "Error",
         description: error.message,
@@ -73,6 +78,15 @@ const Dashboard = () => {
   };
 
   const handleDownloadBrochure = async () => {
+    if (!isStudentRegistered) {
+      toast({
+        title: "Registration Required",
+        description: "Please complete student registration first",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!formData.email) {
       toast({
         title: "Error",
@@ -86,7 +100,7 @@ const Dashboard = () => {
       // Open the Google Drive link in a new tab
       window.open('https://drive.google.com/file/d/1_XTd8M2XCbBv4EeBz9sTki0IWMzuHEzs/view?usp=sharing', '_blank');
 
-      // Update lead status
+      // Update student status
       const response = await fetch(`${API_BASE_URL}/update_lead`, {
         method: 'PATCH',
         headers: {
@@ -107,7 +121,7 @@ const Dashboard = () => {
         });
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update lead');
+        throw new Error(errorData.error || 'Failed to update student record');
       }
     } catch (error) {
       console.error('Error opening brochure:', error);
@@ -120,6 +134,15 @@ const Dashboard = () => {
   };
 
   const handleAttendWebinar = () => {
+    if (!isStudentRegistered) {
+      toast({
+        title: "Registration Required",
+        description: "Please complete student registration first",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setShowVideo(true);
   };
 
@@ -154,7 +177,7 @@ const Dashboard = () => {
         });
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update lead');
+        throw new Error(errorData.error || 'Failed to update webinar attendance');
       }
     } catch (error) {
       console.error('Error updating webinar attendance:', error);
@@ -216,7 +239,7 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Lead Registration Form */}
+          {/* Student Registration Form */}
           <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
             <CardHeader>
               <div className="flex items-center space-x-3">
@@ -224,7 +247,7 @@ const Dashboard = () => {
                   <BookOpen className="h-6 w-6 text-purple-600" />
                 </div>
                 <div>
-                  <CardTitle className="text-gray-800">Lead Registration</CardTitle>
+                  <CardTitle className="text-gray-800">Student Registration</CardTitle>
                   <CardDescription>
                     Register for our webinar and download our brochure
                   </CardDescription>
@@ -232,7 +255,7 @@ const Dashboard = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmitLead} className="space-y-4">
+              <form onSubmit={handleSubmitStudent} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="name" className="text-gray-700">Name</Label>
                   <Input
@@ -242,6 +265,7 @@ const Dashboard = () => {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                    disabled={isStudentRegistered}
                   />
                 </div>
                 
@@ -254,6 +278,7 @@ const Dashboard = () => {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                    disabled={isStudentRegistered}
                   />
                 </div>
                 
@@ -262,6 +287,7 @@ const Dashboard = () => {
                   <Select 
                     value={formData.education} 
                     onValueChange={(value) => setFormData({ ...formData, education: value })}
+                    disabled={isStudentRegistered}
                   >
                     <SelectTrigger className="border-gray-300 focus:border-purple-500 focus:ring-purple-500">
                       <SelectValue placeholder="Select your education level" />
@@ -276,12 +302,18 @@ const Dashboard = () => {
                   </Select>
                 </div>
                 
-                <Button 
-                  type="submit" 
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 rounded-lg transition-colors duration-200"
-                >
-                  Submit Lead
-                </Button>
+                {!isStudentRegistered ? (
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 rounded-lg transition-colors duration-200"
+                  >
+                    Submit
+                  </Button>
+                ) : (
+                  <div className="text-center py-3">
+                    <span className="text-green-600 font-medium">✓ Registration Complete</span>
+                  </div>
+                )}
               </form>
             </CardContent>
           </Card>
@@ -289,7 +321,7 @@ const Dashboard = () => {
           {/* Action Cards */}
           <div className="space-y-6">
             {/* Download Brochure Card */}
-            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm hover:shadow-xl transition-shadow duration-300">
+            <Card className={`shadow-lg border-0 bg-white/80 backdrop-blur-sm transition-shadow duration-300 ${!isStudentRegistered ? 'opacity-50' : 'hover:shadow-xl'}`}>
               <CardHeader>
                 <div className="flex items-center space-x-3">
                   <div className="p-2 bg-blue-100 rounded-lg">
@@ -306,16 +338,22 @@ const Dashboard = () => {
               <CardContent>
                 <Button
                   onClick={handleDownloadBrochure}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors duration-200"
+                  disabled={!isStudentRegistered}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Download className="mr-2 h-4 w-4" />
                   Download Brochure
                 </Button>
+                {!isStudentRegistered && (
+                  <p className="text-sm text-gray-500 mt-2 text-center">
+                    Complete registration to unlock
+                  </p>
+                )}
               </CardContent>
             </Card>
 
             {/* Attend Webinar Card */}
-            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm hover:shadow-xl transition-shadow duration-300">
+            <Card className={`shadow-lg border-0 bg-white/80 backdrop-blur-sm transition-shadow duration-300 ${!isStudentRegistered ? 'opacity-50' : 'hover:shadow-xl'}`}>
               <CardHeader>
                 <div className="flex items-center space-x-3">
                   <div className="p-2 bg-green-100 rounded-lg">
@@ -332,11 +370,17 @@ const Dashboard = () => {
               <CardContent>
                 <Button
                   onClick={handleAttendWebinar}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg transition-colors duration-200"
+                  disabled={!isStudentRegistered}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Video className="mr-2 h-4 w-4" />
                   Join Webinar
                 </Button>
+                {!isStudentRegistered && (
+                  <p className="text-sm text-gray-500 mt-2 text-center">
+                    Complete registration to unlock
+                  </p>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -387,4 +431,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
