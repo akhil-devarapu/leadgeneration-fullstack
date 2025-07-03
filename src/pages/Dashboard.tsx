@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,8 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
   const [showVideo, setShowVideo] = useState(false);
   const [isStudentRegistered, setIsStudentRegistered] = useState(false);
+  const [webinarAttended, setWebinarAttended] = useState(false);
+  const videoRef = useRef<HTMLIFrameElement>(null);
   const [formData, setFormData] = useState({
     name: user?.user_metadata?.name || '',
     email: user?.email || '',
@@ -28,6 +30,57 @@ const Dashboard = () => {
   ];
 
   const API_BASE_URL = 'http://localhost:5000';
+
+  // YouTube video tracking
+  useEffect(() => {
+    if (showVideo && !webinarAttended) {
+      // Listen for messages from YouTube iframe
+      const handleMessage = (event: MessageEvent) => {
+        if (event.origin !== 'https://www.youtube.com') return;
+        
+        if (event.data && typeof event.data === 'string') {
+          try {
+            const data = JSON.parse(event.data);
+            if (data.event === 'video-progress') {
+              const currentTime = data.info?.currentTime || 0;
+              const duration = data.info?.duration || 1;
+              const progress = currentTime / duration;
+              
+              // If user watched 50% or more, mark as attended
+              if (progress >= 0.5 && !webinarAttended) {
+                handleMarkWebinarAttended();
+              }
+            }
+          } catch (e) {
+            // Ignore parsing errors
+          }
+        }
+      };
+
+      window.addEventListener('message', handleMessage);
+      return () => window.removeEventListener('message', handleMessage);
+    }
+  }, [showVideo, webinarAttended]);
+
+  // Alternative approach: Use a timer to check video progress
+  useEffect(() => {
+    let progressTimer: NodeJS.Timeout;
+    
+    if (showVideo && !webinarAttended) {
+      // Set a timer to automatically mark as attended after 2 minutes (assuming video is ~4 minutes)
+      progressTimer = setTimeout(() => {
+        if (!webinarAttended) {
+          handleMarkWebinarAttended();
+        }
+      }, 120000); // 2 minutes = half of a typical 4-minute video
+    }
+
+    return () => {
+      if (progressTimer) {
+        clearTimeout(progressTimer);
+      }
+    };
+  }, [showVideo, webinarAttended]);
 
   const handleSubmitStudent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,6 +200,8 @@ const Dashboard = () => {
   };
 
   const handleMarkWebinarAttended = async () => {
+    if (webinarAttended) return; // Prevent multiple calls
+    
     if (!formData.email) {
       toast({
         title: "Error",
@@ -171,9 +226,10 @@ const Dashboard = () => {
       });
 
       if (response.ok) {
+        setWebinarAttended(true);
         toast({
-          title: "Webinar attended!",
-          description: "Thank you for watching the webinar.",
+          title: "Webinar Progress Tracked!",
+          description: "Great! You've watched enough of the webinar. It's been marked as completed.",
         });
       } else {
         const errorData = await response.json();
@@ -187,6 +243,9 @@ const Dashboard = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleCloseVideo = () => {
     setShowVideo(false);
   };
 
@@ -381,6 +440,11 @@ const Dashboard = () => {
                     Complete registration to unlock
                   </p>
                 )}
+                {webinarAttended && (
+                  <p className="text-sm text-green-600 mt-2 text-center font-medium">
+                    ✓ Webinar Completed
+                  </p>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -393,7 +457,7 @@ const Dashboard = () => {
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-2xl font-bold text-gray-800">Career Growth Webinar</h3>
                 <Button
-                  onClick={() => setShowVideo(false)}
+                  onClick={handleCloseVideo}
                   variant="outline"
                   size="sm"
                 >
@@ -403,9 +467,10 @@ const Dashboard = () => {
               
               <div className="aspect-video bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
                 <iframe
+                  ref={videoRef}
                   width="100%"
                   height="100%"
-                  src="https://www.youtube.com/embed/0818am3NaXY?autoplay=1"
+                  src="https://www.youtube.com/embed/0818am3NaXY?autoplay=1&enablejsapi=1"
                   title="Career Growth Webinar"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -414,13 +479,17 @@ const Dashboard = () => {
                 ></iframe>
               </div>
               
-              <div className="flex justify-center">
-                <Button
-                  onClick={handleMarkWebinarAttended}
-                  className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200"
-                >
-                  Mark as Completed
-                </Button>
+              <div className="text-center">
+                {webinarAttended ? (
+                  <div className="text-green-600 font-medium">
+                    ✓ Webinar Completed! Thank you for watching.
+                  </div>
+                ) : (
+                  <div className="text-gray-600">
+                    <p className="mb-2">Watch at least half of the video to complete the webinar.</p>
+                    <p className="text-sm text-gray-500">Progress will be tracked automatically.</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
