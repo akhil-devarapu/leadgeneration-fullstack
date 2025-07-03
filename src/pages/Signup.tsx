@@ -51,10 +51,9 @@ const Signup = () => {
         });
       } else {
         toast({
-          title: "Check your email!",
-          description: "We've sent you a verification link. Please check your email and click the link to verify your account.",
+          title: "Account created!",
+          description: "You can now sign in with your credentials.",
         });
-        // Redirect to login page after successful signup
         navigate('/login');
       }
     } catch (error) {
