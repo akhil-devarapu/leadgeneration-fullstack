@@ -38,40 +38,46 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       (event, session) => {
         console.log('Auth state changed:', event, session);
         
-        // For login events, check if email is confirmed
-        if (event === 'SIGNED_IN' && session?.user) {
-          // Only allow access if email is confirmed
-          if (session.user.email_confirmed_at) {
-            setSession(session);
-            setUser(session.user);
-          } else {
-            // If email not confirmed, sign out immediately
-            console.log('Email not confirmed, signing out');
-            supabase.auth.signOut();
-            setSession(null);
-            setUser(null);
-          }
-        } else if (event === 'SIGNED_OUT') {
-          setSession(null);
-          setUser(null);
-        } else if (event === 'TOKEN_REFRESHED' && session?.user?.email_confirmed_at) {
+        // Only allow authenticated sessions for verified users
+        if (session?.user?.email_confirmed_at) {
           setSession(session);
           setUser(session.user);
+          console.log('User authenticated with verified email');
+        } else {
+          // Clear session for unverified users
+          setSession(null);
+          setUser(null);
+          
+          // If someone tries to sign in without verification, sign them out
+          if (event === 'SIGNED_IN' && session?.user && !session.user.email_confirmed_at) {
+            console.log('Email not verified, signing out user');
+            supabase.auth.signOut();
+          }
         }
         
         setLoading(false);
       }
     );
 
-    // Get initial session
+    // Get initial session and check verification status
     supabase.auth.getSession().then(({ data: { session } }) => {
-      // Only set session if user is confirmed (email verified)
+      console.log('Initial session check:', session);
+      
+      // Only allow session if email is verified
       if (session?.user?.email_confirmed_at) {
         setSession(session);
         setUser(session.user);
+        console.log('Initial session: User has verified email');
       } else {
         setSession(null);
         setUser(null);
+        console.log('Initial session: User email not verified or no session');
+        
+        // If there's a session but email isn't verified, sign out
+        if (session?.user && !session.user.email_confirmed_at) {
+          console.log('Signing out user with unverified email');
+          supabase.auth.signOut();
+        }
       }
       setLoading(false);
     });
@@ -80,6 +86,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = async (email: string, password: string) => {
+    console.log('Login attempt for:', email);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -87,15 +94,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
 
       if (error) {
+        console.log('Login error:', error.message);
         return { error: error.message };
       }
 
-      // Additional check: if user is not confirmed, sign out immediately
-      if (data.user && !data.user.email_confirmed_at) {
+      // Strict verification check after login
+      if (!data.user?.email_confirmed_at) {
+        console.log('Login blocked: Email not verified');
         await supabase.auth.signOut();
         return { error: 'Please verify your email before signing in. Check your inbox for the verification link.' };
       }
 
+      console.log('Login successful for verified user');
       return { error: null };
     } catch (error) {
       console.error('Login error:', error);
@@ -104,6 +114,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const signup = async (name: string, email: string, password: string) => {
+    console.log('Signup attempt for:', email);
     try {
       const redirectUrl = `${window.location.origin}/`;
       
@@ -119,11 +130,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
 
       if (error) {
+        console.log('Signup error:', error.message);
         return { error: error.message };
       }
 
-      // After successful signup, immediately sign out to prevent auto-login
+      // Ensure user is signed out after signup to prevent auto-login
       await supabase.auth.signOut();
+      console.log('Signup successful, user signed out to await verification');
 
       return { error: null };
     } catch (error) {
@@ -133,6 +146,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = async () => {
+    console.log('Logging out user');
     await supabase.auth.signOut();
   };
 
