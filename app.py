@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from crew.crew_definition import run_pipeline, update_existing_lead_pipeline,_run_scoring_summary_email

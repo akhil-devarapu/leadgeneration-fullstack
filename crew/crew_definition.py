@@ -10,9 +10,12 @@ from agents.lead_reader import LeadReaderAgent
 from agents.scoring_agent import ScoringAgentLLM
 from agents.summary_agent import SummaryAgent
 from agents.email_agent import EmailAgent
+
 import pandas as pd
 import os
+
 CSV_FILE = "leads_data.csv"
+
 
 def run_pipeline(new_lead_data):
     """
@@ -137,17 +140,17 @@ def _run_scoring_summary_email(lead_data):
     scorer = ScoringAgentLLM()
     summary_gen = SummaryAgent()
     emailer = EmailAgent(
-        smtp_server="smtp.gmail.com",
-        smtp_port=587,
-        smtp_username="akhilchowdarydevarapu@gmail.com",
-        smtp_password="wwai uqba qrkm vrfg",
+        smtp_server=os.getenv("SMTP_SERVER", "smtp.gmail.com"),
+        smtp_port=int(os.getenv("SMTP_PORT", 587)),
+        smtp_username=os.getenv("SMTP_USERNAME"),
+        smtp_password=os.getenv("SMTP_PASSWORD"),
         test_mode=False
     )
 
     # Run scoring
     score = scorer.score_lead(lead_data)
 
-    # NEW: Unpack tuple from generate_summary
+    # Unpack tuple from generate_summary
     summary_text, category = summary_gen.generate_summary(lead_data, score)
 
     # Send email using the summary text only
