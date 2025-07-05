@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ArrowLeft } from 'lucide-react';
 
 const Signup = () => {
   const [name, setName] = useState('');
@@ -71,6 +71,16 @@ const Signup = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+        {/* Back to Home Button */}
+        <div className="mb-6">
+          <Link to="/">
+            <Button variant="ghost" className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 p-2">
+              <ArrowLeft className="h-4 w-4" />
+              <span>Back to Home</span>
+            </Button>
+          </Link>
+        </div>
+        
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-blue-900 mb-2">NxtWave</h1>
           <p className="text-gray-600">Start your journey to success</p>
