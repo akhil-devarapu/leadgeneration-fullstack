@@ -3,7 +3,6 @@ from agents.scoring_agent import ScoringAgentLLM
 from agents.summary_agent import SummaryAgent
 from agents.email_agent import EmailAgent
 
-import pandas as pd
 import os
 
 CSV_FILE = "leads_data.csv"

@@ -61,6 +61,7 @@ Click "Create Static Site" and wait for deployment.
 
 ### Simplified Architecture
 - **No CrewAI dependency**: Removed to avoid Rust compilation issues
+- **No pandas dependency**: Removed to avoid C compilation issues
 - **Custom workflow**: Uses our own agent system
 - **Same functionality**: All features work as before
 
@@ -87,18 +88,31 @@ Click "Create Static Site" and wait for deployment.
 
 ### Removed Dependencies
 - `crewai`: Removed to avoid Rust compilation issues
+- `pandas`: Removed to avoid C compilation issues
 - Complex dependencies: Simplified to basic Python packages
 
 ### Maintained Functionality
 - ✅ Lead scoring and processing
 - ✅ Email sending with personalized content
-- ✅ CSV data storage
+- ✅ CSV data storage (using built-in csv module)
 - ✅ Frontend-backend communication
 - ✅ All agent workflows
 
 ### Deployment Files
-- ✅ `requirements.txt`: Simplified dependencies
+- ✅ `requirements.txt`: Simplified dependencies (no pandas/crewai)
 - ✅ `app.py`: Updated for production
 - ✅ `render.yaml`: Configuration for both services
 - ✅ `Procfile`: Backend deployment
-- ✅ `runtime.txt`: Python version specification 
+- ✅ `runtime.txt`: Python 3.11.0 specification
+
+## Fixed Issues
+
+### Python 3.13 Compatibility
+- **Problem**: pandas compilation errors with Python 3.13
+- **Solution**: Removed pandas, using built-in csv module
+- **Result**: All functionality preserved without compilation issues
+
+### Rust Compilation Issues
+- **Problem**: CrewAI Rust dependencies failing on Render
+- **Solution**: Removed CrewAI, using custom agent system
+- **Result**: Same workflow without complex dependencies 
