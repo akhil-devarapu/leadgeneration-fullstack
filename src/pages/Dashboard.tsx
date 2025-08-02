@@ -1,21 +1,19 @@
 
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
-import { Download, Video, LogOut, User, BookOpen } from 'lucide-react';
+import { Download, Video, User, BookOpen } from 'lucide-react';
 
 const Dashboard = () => {
-  const { user, logout } = useAuth();
   const [showVideo, setShowVideo] = useState(false);
   const [isStudentRegistered, setIsStudentRegistered] = useState(false);
   const [formData, setFormData] = useState({
-    name: user?.user_metadata?.name || '',
-    email: user?.email || '',
+    name: '',
+    email: '',
     education: ''
   });
 
@@ -27,7 +25,8 @@ const Dashboard = () => {
     'Other'
   ];
 
-  const API_BASE_URL = 'http://localhost:5000';
+  // Use environment variable for API URL, fallback to localhost for development
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   const handleSubmitStudent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -190,14 +189,6 @@ const Dashboard = () => {
     setShowVideo(false);
   };
 
-  const handleLogout = () => {
-    logout();
-    toast({
-      title: "Logged out",
-      description: "You have been successfully logged out.",
-    });
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
       {/* Header */}
@@ -210,17 +201,8 @@ const Dashboard = () => {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 text-gray-700">
                 <User className="h-5 w-5" />
-                <span className="font-medium">{user?.user_metadata?.name || user?.email}</span>
+                <span className="font-medium">Student Portal</span>
               </div>
-              <Button
-                onClick={handleLogout}
-                variant="outline"
-                size="sm"
-                className="flex items-center space-x-2 border-gray-300 hover:bg-gray-50"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>Logout</span>
-              </Button>
             </div>
           </div>
         </div>
@@ -231,7 +213,7 @@ const Dashboard = () => {
         {/* Welcome Section */}
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Welcome, {user?.user_metadata?.name || user?.email}!
+            Welcome to NxtWave Student Portal!
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Let's explore your career opportunities and take the next step towards your professional growth.

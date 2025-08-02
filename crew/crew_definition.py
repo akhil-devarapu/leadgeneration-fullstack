@@ -1,11 +1,3 @@
-from crewai import Crew
-from crew.tasks import (
-    read_task,
-    score_task,
-    summary_task,
-    email_task
-)
-
 from agents.lead_reader import LeadReaderAgent
 from agents.scoring_agent import ScoringAgentLLM
 from agents.summary_agent import SummaryAgent
@@ -26,46 +18,31 @@ def run_pipeline(new_lead_data):
       - run scoring/summarizing/email for new leads
     """
 
-    # Create Crew object (not strictly required since you run steps manually)
-    crew = Crew(
-        agents=[
-            read_task.agent,
-            score_task.agent,
-            summary_task.agent,
-            email_task.agent
-        ],
-        tasks=[
-            read_task,
-            score_task,
-            summary_task,
-            email_task
-        ]
-    )
-
     # Load existing leads
     reader = LeadReaderAgent()
-    all_leads_df = reader.load_leads()
+    all_leads = reader.load_leads()
 
     # Check if user already exists
     email = new_lead_data["Email"]
-    existing_lead = all_leads_df[all_leads_df["Email"] == email]
+    existing_lead = None
+    
+    for lead in all_leads:
+        if lead.get("Email") == email:
+            existing_lead = lead
+            break
 
-    if not existing_lead.empty:
+    if existing_lead:
         # Existing user → update data
-        all_leads_df.loc[
-            all_leads_df["Email"] == email,
-            ["Name", "Education", "Attended Webinar", "Downloaded Brochure"]
-        ] = [
-            new_lead_data["Name"],
-            new_lead_data["Education"],
-            new_lead_data.get("Attended Webinar", "No"),
-            new_lead_data.get("Downloaded Brochure", "No"),
-        ]
-        all_leads_df.to_csv(CSV_FILE, index=False)
+        existing_lead.update({
+            "Name": new_lead_data["Name"],
+            "Education": new_lead_data["Education"],
+            "Attended Webinar": new_lead_data.get("Attended Webinar", "No"),
+            "Downloaded Brochure": new_lead_data.get("Downloaded Brochure", "No"),
+        })
+        reader.save_leads(all_leads)
 
         # Run scoring and send email again
-        lead_dict = all_leads_df[all_leads_df["Email"] == email].iloc[0].to_dict()
-        score, summary = _run_scoring_summary_email(lead_dict)
+        score, summary = _run_scoring_summary_email(existing_lead)
 
         return {
             "message": "Lead already existed and data updated.",
@@ -77,12 +54,8 @@ def run_pipeline(new_lead_data):
         # New user → run full pipeline
         score, summary = _run_scoring_summary_email(new_lead_data)
 
-        all_leads_df = pd.concat([
-            all_leads_df,
-            pd.DataFrame([new_lead_data])
-        ], ignore_index=True)
-
-        all_leads_df.to_csv(CSV_FILE, index=False)
+        # Add new lead
+        reader.add_lead(new_lead_data)
 
         return {
             "message": "New lead saved and email sent.",
@@ -105,22 +78,17 @@ def update_existing_lead_pipeline(email, updates):
 
     # Load existing leads
     reader = LeadReaderAgent()
-    all_leads_df = reader.load_leads()
+    all_leads = reader.load_leads()
 
-    if email not in all_leads_df["Email"].values:
+    # Check if lead exists
+    lead_exists = any(lead.get("Email") == email for lead in all_leads)
+    if not lead_exists:
         return {"error": "Lead not found."}
 
-    # Apply updates
-    for col, value in updates.items():
-        if col in all_leads_df.columns:
-            all_leads_df.loc[
-                all_leads_df["Email"] == email, col
-            ] = value
-
-    all_leads_df.to_csv(CSV_FILE, index=False)
-
-    # Fetch updated lead
-    updated_lead = all_leads_df[all_leads_df["Email"] == email].iloc[0].to_dict()
+    # Update the lead
+    updated_lead = reader.update_lead(email, updates)
+    if not updated_lead:
+        return {"error": "Failed to update lead."}
 
     # Run scoring, summary, email again
     score, summary = _run_scoring_summary_email(updated_lead)
@@ -139,12 +107,18 @@ def _run_scoring_summary_email(lead_data):
 
     scorer = ScoringAgentLLM()
     summary_gen = SummaryAgent()
+    
+    # Check if email credentials are configured
+    smtp_username = os.getenv("SMTP_USERNAME")
+    smtp_password = os.getenv("SMTP_PASSWORD")
+    test_mode = not (smtp_username and smtp_password)
+    
     emailer = EmailAgent(
         smtp_server=os.getenv("SMTP_SERVER", "smtp.gmail.com"),
         smtp_port=int(os.getenv("SMTP_PORT", 587)),
-        smtp_username=os.getenv("SMTP_USERNAME"),
-        smtp_password=os.getenv("SMTP_PASSWORD"),
-        test_mode=False
+        smtp_username=smtp_username,
+        smtp_password=smtp_password,
+        test_mode=test_mode
     )
 
     # Run scoring
@@ -154,7 +128,7 @@ def _run_scoring_summary_email(lead_data):
     summary_text, category = summary_gen.generate_summary(lead_data, score)
 
     # Send email using the summary text only
-    emailer.send_email(
+    email_result = emailer.send_email(
         recipient_email=lead_data["Email"],
         lead_name=lead_data["Name"],
         score=score,

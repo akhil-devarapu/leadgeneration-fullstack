@@ -1,73 +1,166 @@
-# Welcome to your Lovable project
+# Lead Generation System with CrewAI
 
-## Project info
+A full-stack lead generation application built with React frontend and Flask backend, powered by CrewAI for intelligent lead processing and email automation.
 
-**URL**: https://lovable.dev/projects/a59a5ad4-00c0-4a66-9b03-6df4765e954d
+## 🚀 Features
 
-## How can I edit this code?
+- **CrewAI Workflow**: Intelligent lead processing with specialized agents
+- **Lead Scoring**: Automated scoring based on education and engagement
+- **Personalized Emails**: Dynamic email content based on lead category
+- **CSV Storage**: Persistent data storage with CSV files
+- **Real-time Updates**: Lead updates trigger re-scoring and new emails
+- **Modern UI**: Beautiful React interface with Shadcn/ui components
 
-There are several ways of editing your application.
+## 🏗️ Architecture
 
-**Use Lovable**
+### Backend (Flask + CrewAI)
+- **Lead Reader Agent**: Manages CSV data storage
+- **Scoring Agent**: Calculates lead scores (50-100)
+- **Summary Agent**: Generates personalized email content
+- **Email Agent**: Sends emails (with test mode support)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/a59a5ad4-00c0-4a66-9b03-6df4765e954d) and start prompting.
+### Frontend (React + Vite)
+- **Modern UI**: Built with React, TypeScript, and Tailwind CSS
+- **Shadcn/ui**: Beautiful, accessible components
+- **Real-time Updates**: Dynamic form handling and validation
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🛠️ Tech Stack
 
-**Use your preferred IDE**
+### Backend
+- **Flask**: Python web framework
+- **CrewAI**: Multi-agent workflow system
+- **Pandas**: Data manipulation and CSV handling
+- **Gunicorn**: Production WSGI server
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Frontend
+- **React 18**: Modern React with hooks
+- **TypeScript**: Type-safe development
+- **Vite**: Fast build tool
+- **Tailwind CSS**: Utility-first CSS framework
+- **Shadcn/ui**: High-quality React components
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 📦 Installation
 
-Follow these steps:
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
+- Git
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Local Development
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd leadgeneration-fullstack
+   ```
 
-# Step 3: Install the necessary dependencies.
-npm i
+2. **Backend Setup**
+   ```bash
+   pip install -r requirements.txt
+   python app.py
+   ```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+3. **Frontend Setup**
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+4. **Environment Variables**
+   Create a `.env` file:
+   ```env
+   SMTP_SERVER=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_USERNAME=your-email@gmail.com
+   SMTP_PASSWORD=your-app-password
+   ```
+
+## 🚀 Deployment
+
+### Render Deployment
+
+1. **Backend Service**
+   - Create new Web Service on Render
+   - Environment: Python
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `gunicorn app:app --bind 0.0.0.0:$PORT`
+
+2. **Frontend Service**
+   - Create new Static Site on Render
+   - Build Command: `npm install && npm run build`
+   - Publish Directory: `dist`
+
+3. **Environment Variables**
+   - `SMTP_SERVER`: `smtp.gmail.com`
+   - `SMTP_PORT`: `587`
+   - `SMTP_USERNAME`: Your Gmail address
+   - `SMTP_PASSWORD`: Your Gmail app password
+   - `VITE_API_URL`: Your backend URL
+
+See `DEPLOYMENT_GUIDE.md` for detailed instructions.
+
+## 🔧 Configuration
+
+### Email Setup
+1. Enable 2FA on your Gmail account
+2. Generate an App Password
+3. Use the App Password in SMTP_PASSWORD
+
+### CORS Configuration
+- Backend allows all origins for production
+- Frontend automatically connects to backend
+
+## 📊 API Endpoints
+
+- `GET /health`: Health check
+- `POST /submit_lead`: Submit new lead
+- `PATCH /update_lead`: Update existing lead
+
+## 🧪 Testing
+
+Run the test suite:
+```bash
+python test_crewai_workflow.py
 ```
 
-**Edit a file directly in GitHub**
+## 📁 Project Structure
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```
+leadgeneration-fullstack/
+├── app.py                 # Flask backend
+├── requirements.txt       # Python dependencies
+├── Procfile             # Render deployment
+├── runtime.txt          # Python version
+├── agents/              # CrewAI agents
+│   ├── lead_reader.py
+│   ├── scoring_agent.py
+│   ├── summary_agent.py
+│   └── email_agent.py
+├── crew/                # CrewAI configuration
+│   ├── crew_definition.py
+│   ├── agents.py
+│   └── tasks.py
+├── src/                 # React frontend
+│   ├── pages/
+│   ├── components/
+│   └── App.tsx
+├── package.json         # Node.js dependencies
+└── vite.config.ts       # Vite configuration
+```
 
-**Use GitHub Codespaces**
+## 🤝 Contributing
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
 
-## What technologies are used for this project?
+## 📄 License
 
-This project is built with:
+This project is licensed under the MIT License.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🆘 Support
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/a59a5ad4-00c0-4a66-9b03-6df4765e954d) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+For deployment issues, see `DEPLOYMENT_GUIDE.md`.
+For development issues, check the logs and test files.

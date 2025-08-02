@@ -1,0 +1,102 @@
+[
+  {
+    "Name": "Test User",
+    "Email": "test@example.com",
+    "Education": "B.Tech",
+    "Attended Webinar": "No",
+    "Downloaded Brochure": "No",
+    "Created_At": "2025-08-01 17:34:23",
+    "Score": 30,
+    "Summary": "Test User is a B.Tech student with a lead score of 30. This student shows good potential for our programs."
+  },
+  {
+    "Name": "John Doe",
+    "Email": "john.doe@example.com",
+    "Education": "B.Tech",
+    "Attended Webinar": "Yes",
+    "Downloaded Brochure": "Yes",
+    "Created_At": "2025-08-01 17:37:01",
+    "Score": 80,
+    "Summary": "John Doe is a B.Tech student with a lead score of 80. They have attended our webinar. They have downloaded our brochure. This student shows good potential for our programs."
+  },
+  {
+    "Name": "Alice Johnson",
+    "Email": "alice.johnson@example.com",
+    "Education": "B.Sc",
+    "Attended Webinar": "Yes",
+    "Downloaded Brochure": "Yes",
+    "Created_At": "2025-08-01 17:40:46",
+    "Score": 80,
+    "Summary": "Alice Johnson is a B.Sc student with a lead score of 80. They have attended our webinar. They have downloaded our brochure. This student shows good potential for our programs."
+  },
+  {
+    "Name": "Test B.Tech User",
+    "Email": "test.b.tech@example.com",
+    "Education": "B.Tech",
+    "Attended Webinar": "No",
+    "Downloaded Brochure": "No",
+    "Created_At": "2025-08-01 17:40:46",
+    "Score": 30,
+    "Summary": "Test B.Tech User is a B.Tech student with a lead score of 30. This student shows good potential for our programs."
+  },
+  {
+    "Name": "Test B.Sc User",
+    "Email": "test.b.sc@example.com",
+    "Education": "B.Sc",
+    "Attended Webinar": "No",
+    "Downloaded Brochure": "No",
+    "Created_At": "2025-08-01 17:40:46",
+    "Score": 30,
+    "Summary": "Test B.Sc User is a B.Sc student with a lead score of 30. This student shows good potential for our programs."
+  },
+  {
+    "Name": "Test B.Com User",
+    "Email": "test.b.com@example.com",
+    "Education": "B.Com",
+    "Attended Webinar": "No",
+    "Downloaded Brochure": "No",
+    "Created_At": "2025-08-01 17:40:46",
+    "Score": 20,
+    "Summary": "Test B.Com User is a B.Com student with a lead score of 20. This student shows good potential for our programs."
+  },
+  {
+    "Name": "Test Diploma User",
+    "Email": "test.diploma@example.com",
+    "Education": "Diploma",
+    "Attended Webinar": "No",
+    "Downloaded Brochure": "No",
+    "Created_At": "2025-08-01 17:40:46",
+    "Score": 25,
+    "Summary": "Test Diploma User is a Diploma student with a lead score of 25. This student shows good potential for our programs."
+  },
+  {
+    "Name": "Test Other User",
+    "Email": "test.other@example.com",
+    "Education": "Other",
+    "Attended Webinar": "No",
+    "Downloaded Brochure": "No",
+    "Created_At": "2025-08-01 17:40:46",
+    "Score": 20,
+    "Summary": "Test Other User is a Other student with a lead score of 20. This student shows good potential for our programs."
+  },
+  {
+    "Name": "Test Student",
+    "Email": "test.student@example.com",
+    "Education": "B.Tech",
+    "Attended Webinar": "No",
+    "Downloaded Brochure": "No",
+    "Created_At": "2025-08-01 18:09:20",
+    "Score": 30,
+    "Summary": "Test Student is a B.Tech student with a lead score of 30. This student shows good potential for our programs."
+  },
+  {
+    "Name": "Devarapu Akhil",
+    "Email": "akhilchowdarydevarapu@gmail.com",
+    "Education": "B.Tech",
+    "Attended Webinar": "No",
+    "Downloaded Brochure": "No",
+    "Created_At": "2025-08-01 18:15:07",
+    "Score": 30,
+    "Summary": "Devarapu Akhil is a B.Tech student with a lead score of 30. This student shows good potential for our programs."
+  }
+]
