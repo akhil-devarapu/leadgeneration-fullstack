@@ -59,6 +59,11 @@ Click "Create Static Site" and wait for deployment.
 - CSV files will be stored in the Render filesystem
 - Data will persist between deployments
 
+### Simplified Architecture
+- **No CrewAI dependency**: Removed to avoid Rust compilation issues
+- **Custom workflow**: Uses our own agent system
+- **Same functionality**: All features work as before
+
 ## Testing Deployment
 
 1. **Backend Health Check**: Visit `https://your-backend.onrender.com/health`
@@ -76,4 +81,24 @@ Click "Create Static Site" and wait for deployment.
 ### Logs
 - Check Render logs for both services
 - Backend logs will show email sending status
-- Frontend logs will show build status 
+- Frontend logs will show build status
+
+## Changes Made for Deployment
+
+### Removed Dependencies
+- `crewai`: Removed to avoid Rust compilation issues
+- Complex dependencies: Simplified to basic Python packages
+
+### Maintained Functionality
+- ✅ Lead scoring and processing
+- ✅ Email sending with personalized content
+- ✅ CSV data storage
+- ✅ Frontend-backend communication
+- ✅ All agent workflows
+
+### Deployment Files
+- ✅ `requirements.txt`: Simplified dependencies
+- ✅ `app.py`: Updated for production
+- ✅ `render.yaml`: Configuration for both services
+- ✅ `Procfile`: Backend deployment
+- ✅ `runtime.txt`: Python version specification 

@@ -13,7 +13,7 @@ def submit_lead():
     try:
         data = request.json
         
-        # Prepare lead data for CrewAI pipeline
+        # Prepare lead data for pipeline
         lead_data = {
             "Name": data["name"],
             "Email": data["email"],
@@ -22,7 +22,7 @@ def submit_lead():
             "Downloaded Brochure": data.get("downloaded_brochure", "No")
         }
 
-        # Run the CrewAI pipeline
+        # Run the pipeline
         result = run_pipeline(lead_data)
         
         return jsonify(result)
@@ -43,7 +43,7 @@ def update_lead():
         if not updates:
             return jsonify({"error": "No updates provided"}), 400
 
-        # Run the CrewAI update pipeline
+        # Run the update pipeline
         result = update_existing_lead_pipeline(email, updates)
         
         if "error" in result:
