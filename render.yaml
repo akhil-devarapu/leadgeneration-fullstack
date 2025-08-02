@@ -18,11 +18,10 @@ services:
         sync: false
 
   # Frontend Service
-  - type: web
+  - type: static
     name: lead-generation-frontend
-    env: static
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     envVars:
       - key: VITE_API_URL
-        value: https://lead-generation-backend.onrender.com 
+        value: https://leadgeneration-fullstack-1.onrender.com 
